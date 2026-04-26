@@ -5,8 +5,8 @@
 %define	libname		%mklibname %{name} %{major}
 %define	develname	%mklibname -d %{name}
 
-# Beta 13 release
-%define		gitdate	20260218
+# Beta 16 release
+%define		gitdate	20260419
 
 %bcond_without	manual
 # As with 7.0.0beta1 java build is disabled in the sources
@@ -18,7 +18,7 @@
 Summary:		A sound synthesis language and library
 Name:		csound
 Version:		7.0.0
-Release:		0.2
+Release:		0.3
 License:		LGPLv2+
 Group:		Sound
 Url:		https://csound.com
@@ -30,10 +30,9 @@ Source1:	https://github.com/csound/csound/releases/download/%{version}/Csound6.1
 %endif
 Source100:	csound.rpmlintrc
 Patch0:		csound-7.0.0beta13-64bit-plugin-path.patch
-Patch1:		csound-7.0.0beta13-default-to-pulse.patch
-Patch2:		csound-7.0.0beta13-sse2.patch
+Patch1:		csound-7.0.0beta16-default-to-pulse.patch
 Patch3:		csound-7.0.0beta13-xdg-open.patch
-Patch4:		csound-7.0.0beta13-fix-cmake-files-path.patch
+Patch4:		csound-7.0.0beta16-fix-cmake-files-path.patch
 BuildRequires:		cmake >= 3.13.4
 BuildRequires:		bison
 BuildRequires:		doxygen
@@ -93,7 +92,8 @@ restricted to any style of music, having been used for many years in at least
 classical, pop, techno, ambient...
 
 %files -f csound7.lang
-%doc COPYING README.md Release_Notes/*
+%license COPYING
+%doc README.md Release_Notes/*
 %{_bindir}/atsa
 %{_bindir}/cs
 %{_bindir}/cs-srconv
@@ -143,7 +143,7 @@ Group:		System/Libraries
 Contains the libraries and the main plug-ins for using Csound.
 
 %files -n %{libname}
-%doc COPYING
+%license COPYING
 %dir %{_libdir}/%{name}
 %dir %{_libdir}/%{name}/plugins-%{api}
 %{_libdir}/lib%{name}64.so.%{major}*
@@ -187,14 +187,13 @@ Obsoletes:	%{name}-devel < %{EVRD}
 Contains headers and libraries for developing applications that use Csound.
 
 %files -n %{develname}
-%doc COPYING
+%license COPYING
 %dir %{_includedir}/%{name}/
 %{_includedir}/%{name}/*
 %{_libdir}/lib%{name}64.so
 #{_libdir}/libcsnd7.so
 %{_libdir}/pkgconfig/%{name}.pc
-%{_datadir}/cmake/csound/CsoundConfig.cmake
-%{_datadir}/cmake/csound/CsoundConfig-relwithdebinfo.cmake
+%{_datadir}/cmake/%{name}/*.cmake
 
 #-------------------------------------------------------------------------------
 
@@ -209,7 +208,7 @@ Requires:	python-numpy
 Contains Python files for using Csound.
 
 %files python
-%doc COPYING
+%license COPYING
 %{py_sitedir}/ctcsound.py
 
 #-------------------------------------------------------------------------------
@@ -226,7 +225,7 @@ Contains Java language bindings for developing and running Java applications
 that use Csound.
 
 %files java
-%doc COPYING
+%license COPYING
 %{_libdir}/lib_jcsound7.so
 %{_libdir}/lib_jcsound.so.1
 %{_libdir}/csnd7.jar
@@ -243,7 +242,7 @@ Requires:	%{name}-java = %{EVRD}
 API documentation for the %{name}-java package.
 
 %files javadoc
-%doc COPYING
+%license COPYING
 %doc %{_javadocdir}/%{name}-java
 %endif
 # End of %%{with java}
@@ -260,7 +259,7 @@ Requires:	jackit
 Contains Jack Audio plugins for Csound.
 
 %files jack
-%doc COPYING
+%license COPYING
 %{_libdir}/%{name}/plugins-%{api}/librtjack.so
 #{_libdir}/%%{name}/plugins-%%{api}/libjackTransport.so
 
@@ -276,7 +275,7 @@ Requires:	dssi
 Disposable Soft Synth Interface (DSSI) plug-in for Csound.
 
 %files dssi
-%doc COPYING
+%license COPYING
 %{_libdir}/%{name}/plugins-%{api}/libdssi4cs.so
 
 #-------------------------------------------------------------------------------
@@ -290,7 +289,7 @@ Requires:	%{libname} = %{EVRD}
 Open Sound Control (OSC) plug-in for Csound.
 
 %files osc
-%doc COPYING
+%license COPYING
 %{_libdir}/%{name}/plugins-%{api}/libosc.so
 
 #-------------------------------------------------------------------------------
@@ -343,8 +342,6 @@ find util1/sortex/ -name "*.c" -o -name "*.h" | xargs chmod 0644
 
 
 %build
-#-DLUA_LIBRARY="%%{_libdir}/libluajit-5.1.so" \
-#-DLUA_MODULE_INSTALL_DIR="%%{_libdir}" \
 %cmake \
 	-DBUILD_RELEASE=1 \
 	-DBUILD_UTILITIES=1 \

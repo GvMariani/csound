@@ -1,0 +1,40 @@
+diff -rupN csound-20260419.old/CMakeLists.txt csound-20260419/CMakeLists.txt
+--- csound-20260419.old/CMakeLists.txt	2026-04-26 16:13:57.816610605 +0200
++++ csound-20260419/CMakeLists.txt	2026-04-26 16:23:24.611928112 +0200
+@@ -1804,7 +1804,7 @@ if(WIN32 OR NOT IOS OR OSXCROSS_TARGET)
+     install(EXPORT CsoundPackageExports
+         FILE "CsoundTargets.cmake"
+         NAMESPACE "Csound::"
+-        DESTINATION "share/csound"
++        DESTINATION "share/cmake/csound"
+     )
+ endif()
+ 
+@@ -1821,10 +1821,10 @@ endif()
+ configure_package_config_file(
+     "${CMAKE_CURRENT_SOURCE_DIR}/cmake/CsoundConfig.cmake.in"
+     "${CMAKE_CURRENT_BINARY_DIR}/CsoundConfig.cmake"
+-    INSTALL_DESTINATION "share/csound"
++    INSTALL_DESTINATION "share/cmake/csound"
+ )
+ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/CsoundConfig.cmake"
+-    DESTINATION "share/csound"
++    DESTINATION "share/cmake/csound"
+ )
+ 
+ # generate and install CsoundConfigVersion.cmake
+@@ -1834,12 +1834,12 @@ write_basic_package_version_file(
+     COMPATIBILITY AnyNewerVersion
+ )
+ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/CsoundConfigVersion.cmake"
+-    DESTINATION "share/csound"
++    DESTINATION "share/cmake/csound"
+ )
+ 
+ # install FindCsound.cmake for projects using Module mode
+ install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindCsound.cmake"
+-    DESTINATION "share/csound"
++    DESTINATION "share/cmake/csound"
+ )
+ 
+ # configure and install pkg-config file
