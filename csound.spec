@@ -14,7 +14,7 @@
 
 # Avoid providing private libraries
 %global		__provides_exclude	_CsoundAC.so | _csnd7.so
-%global		__requires_exclude		cmake(samplerate) | cmake\(SampleRate\)
+%global		__requires_exclude		(cmake(samplerate) | cmake(SampleRate))
 
 Summary:		A sound synthesis language and library
 Name:		csound
