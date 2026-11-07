@@ -1,6 +1,6 @@
-diff -rupN csound-20260218.old/installer/misc/vim/cshelp csound-20260218/installer/misc/vim/cshelp
---- csound-20260218.old/installer/misc/vim/cshelp	2026-02-18 18:21:59.271831300 +0100
-+++ csound-20260218/installer/misc/vim/cshelp	2026-02-18 18:41:47.786776643 +0100
+diff -rupN csound-7.0.0.old/installer/misc/vim/cshelp csound-7.0.0/installer/misc/vim/cshelp
+--- csound-7.0.0.old/installer/misc/vim/cshelp	2026-10-21 15:05:59.000000000 +0200
++++ csound-7.0.0/installer/misc/vim/cshelp	2026-10-31 16:27:44.759827082 +0100
 @@ -3,7 +3,9 @@
  BROWSER_CMD=""
  

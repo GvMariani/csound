@@ -14,26 +14,27 @@
 
 # Avoid providing private libraries
 %global		__provides_exclude	_CsoundAC.so | _csnd7.so
-%global		__requires_exclude		(cmake(samplerate) | cmake(SampleRate))
+# Avoid requiring non-existent cmake files (they appears only if samplerate is built using cmake)
+#global		__requires_exclude		cmake\(samplerate\) | cmake/(SampleRate\)
 
 Summary:		A sound synthesis language and library
 Name:		csound
 Version:		7.0.0
-Release:		0.3
-License:		LGPLv2+
+Release:		1
+License:		LGPL-2.0-or-later
 Group:		Sound
 Url:		https://csound.com
 # Sub-modules are a pain...
-#Source0:	https://github.com/csound/csound/archive/%%{name}-%%{version}.tar.gz
-Source0:	%{name}-%{gitdate}.tar.xz
+Source0:	https://github.com/csound/csound/archive/%{name}-%{version}.tar.gz
+#Source0:	%%{name}-%%{gitdate}.tar.xz
 %if %{with manual}
 Source1:	https://github.com/csound/csound/releases/download/%{version}/Csound6.18.0_manual_html.zip
 %endif
 Source100:	csound.rpmlintrc
-Patch0:		csound-7.0.0beta13-64bit-plugin-path.patch
-Patch1:		csound-7.0.0beta16-default-to-pulse.patch
-Patch3:		csound-7.0.0beta13-xdg-open.patch
-Patch4:		csound-7.0.0beta16-fix-cmake-files-path.patch
+Patch0:		csound-7.0.0-64bit-plugin-path.patch
+Patch1:		csound-7.0.0-default-to-pulse.patch
+Patch3:		csound-7.0.0-xdg-open.patch
+Patch4:		csound-7.0.0-fix-cmake-files.patch
 BuildRequires:		cmake >= 3.13.4
 BuildRequires:		bison
 BuildRequires:		doxygen
@@ -61,12 +62,18 @@ BuildRequires:		pkgconfig(dssi)
 BuildRequires:		pkgconfig(eigen3)
 BuildRequires:		pkgconfig(flac)
 BuildRequires:		pkgconfig(jack)
+BuildRequires:		pkgconfig(libbrotlicommon)
 BuildRequires:		pkgconfig(libcurl)
+BuildRequires:		pkgconfig(ldap)
 BuildRequires:		pkgconfig(libjpeg)
+BuildRequires:		pkgconfig(libidn2)
 BuildRequires:		pkgconfig(liblo)
-BuildRequires:		pkgconfig(libpng)
+BuildRequires:		pkgconfig(libnghttp2)
 BuildRequires:		pkgconfig(libpipewire-0.3)
+BuildRequires:		pkgconfig(libpng)
+BuildRequires:		pkgconfig(libpsl)
 BuildRequires:		pkgconfig(libpulse)
+BuildRequires:		pkgconfig(libzstd)
 BuildRequires:		pkgconfig(lua)
 BuildRequires:		pkgconfig(luajit)
 BuildRequires:		pkgconfig(ogg)
@@ -116,6 +123,7 @@ classical, pop, techno, ambient...
 %{_bindir}/lpc_import
 %{_bindir}/makecsd
 %{_bindir}/mixer
+%{_bindir}/mkir
 %{_bindir}/pv_export
 %{_bindir}/pv_import
 %{_bindir}/pvanal
@@ -135,6 +143,7 @@ classical, pop, techno, ambient...
 Summary:	Csound main library and plug-ins
 Group:		System/Libraries
 # Dropped plugins packages
+%rename	%{name}-dssi
 %rename	%{name}-fltk
 %rename	%{name}-fluidsynth
 %rename	%{name}-stk
@@ -148,32 +157,15 @@ Contains the libraries and the main plug-ins for using Csound.
 %dir %{_libdir}/%{name}
 %dir %{_libdir}/%{name}/plugins-%{api}
 %{_libdir}/lib%{name}64.so.%{major}*
-#{_libdir}/libcsnd7.so.%%{major}*
-#{_libdir}/luaCsnd7.so
-#{_libdir}/%%{name}/plugins-%%{api}/libarrayops.so
-#{_libdir}/%%{name}/plugins-%%{api}/libampmidid.so
-#{_libdir}/%%{name}/plugins-%%{api}/libcontrol.so
 %{_libdir}/%{name}/plugins-%{api}/libdeprecated.so
-#{_libdir}/%%{name}/plugins-%%{api}/libdoppler.so
-#{_libdir}/%%{name}/plugins-%%{api}/libbformdec2.so
-#{_libdir}/%%{name}/plugins-%%{api}/libfractalnoise.so
-#{_libdir}/%%{name}/plugins-%%{api}/libftsamplebank.so
 %{_libdir}/%{name}/plugins-%{api}/libipmidi.so
 %{_libdir}/%{name}/plugins-%{api}/libjoystick.so
-#{_libdir}/%%{name}/plugins-%%{api}/liblfsr.so
-#{_libdir}/%%{name}/plugins-%%{api}/libmixer.so
-#{_libdir}/%%{name}/plugins-%%{api}/libpadsynth.so
 %{_libdir}/%{name}/plugins-%{api}/libpmidi.so
-#{_libdir}/%%{name}/plugins-%%{api}/libpvsops.so
 %{_libdir}/%{name}/plugins-%{api}/librtalsa.so
 %{_libdir}/%{name}/plugins-%{api}/librtpa.so
 %{_libdir}/%{name}/plugins-%{api}/librtpulse.so
 %{_libdir}/%{name}/plugins-%{api}/librtpw.so
-#{_libdir}/%%{name}/plugins-%%{api}/libscansyn.so
-#{_libdir}/%%{name}/plugins-%%{api}/libsignalflowgraph.so
 %{_libdir}/%{name}/plugins-%{api}/libstdutil.so
-#{_libdir}/%%{name}/plugins-%%{api}/libtrigenvsegs.so
-#{_libdir}/%%{name}/plugins-%%{api}/liburandom.so
 
 #-------------------------------------------------------------------------------
 
@@ -192,7 +184,6 @@ Contains headers and libraries for developing applications that use Csound.
 %dir %{_includedir}/%{name}/
 %{_includedir}/%{name}/*
 %{_libdir}/lib%{name}64.so
-#{_libdir}/libcsnd7.so
 %{_libdir}/pkgconfig/%{name}.pc
 %{_datadir}/cmake/%{name}/*.cmake
 
@@ -262,22 +253,6 @@ Contains Jack Audio plugins for Csound.
 %files jack
 %license COPYING
 %{_libdir}/%{name}/plugins-%{api}/librtjack.so
-#{_libdir}/%%{name}/plugins-%%{api}/libjackTransport.so
-
-#-------------------------------------------------------------------------------
-
-%package dssi
-Summary:	Disposable Soft Synth Interface (DSSI) plug-in for Csound
-Group:		Sound
-Requires:	%{libname} = %{EVRD}
-Requires:	dssi
-
-%description dssi
-Disposable Soft Synth Interface (DSSI) plug-in for Csound.
-
-%files dssi
-%license COPYING
-%{_libdir}/%{name}/plugins-%{api}/libdssi4cs.so
 
 #-------------------------------------------------------------------------------
 
@@ -312,7 +287,7 @@ Canonical Reference Manual for Csound.
 #-------------------------------------------------------------------------------
 
 %prep
-%autosetup -p1 -n %{name}-%{gitdate}
+%autosetup -p1
 
 %if %{with_manual}
 # Extract manual files and fix perms
@@ -323,6 +298,8 @@ pushd manual
 	cd html
 	chmod 0644 *.html *.css
 	chmod 0755 images examples
+	# Fix FSF address
+	#sed -i 's/51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA/31 Milk Street, # 960789, Boston, MA 02196, USA/g' copying.txt
 	cd images/callouts
 	chmod 0644 *
 	cd ..
@@ -332,6 +309,8 @@ pushd manual
 	cd examples
 	chmod 0644 *
 	chmod 0755 musical
+	# Fix FSF address
+	#sed -i 's/51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA/31 Milk Street, # 960789, Boston, MA 02196, USA/g' fdl.txt
 	cd ../..
 popd
 %endif
@@ -346,10 +325,8 @@ find util1/sortex/ -name "*.c" -o -name "*.h" | xargs chmod 0644
 %cmake \
 	-DBUILD_RELEASE=1 \
 	-DBUILD_UTILITIES=1 \
-	-DBUILD_DSSI_OPCODES=1 \
 	-DBUILD_PLUGINS=0 \
 	-DBUILD_TESTS=0 \
-	-DBUILD_LTO=1 \
 	-DFAIL_MISSING=0 \
 	-DUSE_DOUBLE=1 \
 	-DUSE_LIB64=1 \

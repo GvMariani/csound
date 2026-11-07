@@ -1,0 +1,21 @@
+diff -rupN csound-7.0.0.old/Top/csound.c csound-7.0.0/Top/csound.c
+--- csound-7.0.0.old/Top/csound.c	2026-10-21 15:05:59.000000000 +0200
++++ csound-7.0.0/Top/csound.c	2026-10-31 16:25:36.220858604 +0100
+@@ -2090,7 +2090,7 @@ static void reset(CSOUND *csound) {
+ #endif
+ #endif
+ #else
+-  strcpy(s, "alsa");
++  strcpy(s, "pulse");
+ #endif
+ #endif
+ 
+@@ -2119,7 +2119,7 @@ static void reset(CSOUND *csound) {
+     strcpy(s, "portmidi");
+ #endif
+ #else
+-    strcpy(s, "alsa");
++    strcpy(s, "pulse");
+ #endif
+   else
+     strcpy(s, "hostbased");
