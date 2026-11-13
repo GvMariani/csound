@@ -1,5 +1,9 @@
 %global	debug_package	%{nil}
 
+# Our samplerate devel package does not provides cmake(xxx) yet:
+# disable generating cmka(samplerate) requires for csound devel package
+%global	__cmake_requires %{nil}
+
 %define	api		7.0
 %define	major		7
 %define	libname		%mklibname %{name} %{major}
@@ -173,6 +177,7 @@ Contains the libraries and the main plug-ins for using Csound.
 Summary:	Csound development files and libraries
 Group:		Development/C
 Requires:	%{libname} = %{EVRD}
+Requires:		pkgconfig(samplerate)
 Provides:	%{name}-devel = %{EVRD}
 Obsoletes:	%{name}-devel < %{EVRD}
 
